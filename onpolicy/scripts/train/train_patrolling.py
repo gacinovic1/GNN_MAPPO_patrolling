@@ -100,7 +100,7 @@ def parse_args(args, parser):
                         help="the observation method to use for global observation")
     parser.add_argument("--observe_bitmap_size", type=int, default=50, 
                         help="the size (squared) to which the bitmap should be scaled for observation")
-    parser.add_argument("--observation_radius", type=float, default=np.Inf, 
+    parser.add_argument("--observation_radius", type=float, default=np.inf, 
                         help="the observable radius for each agent")
     parser.add_argument("--attrition_method", type=str, default="none", 
                         help="the method to use for agent attrition")
