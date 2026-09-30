@@ -173,7 +173,7 @@ class PatrollingRunner(Runner):
 
     def log_env(self, env_infos, total_num_steps):
         for k, v in env_infos.items():
-            if type(v) == wandb.viz.CustomChart and self.use_wandb:
+            if self.use_wandb and type(v) == wandb.viz.CustomChart:
                 wandb.log({k: v}, step=total_num_steps)
             elif len(v) > 0:
                 if self.use_wandb:
