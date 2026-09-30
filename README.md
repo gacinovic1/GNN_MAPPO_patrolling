@@ -1,4 +1,4 @@
-# GNN-MAPPO patroling
+# GNN-MAPPO patrolling
 
 This repository contains the re-implementation of the policy code of the paper ["Graph Neural Network-based Multi-agent Reinforcement Learning for Resilient Distributed Coordination of Multi-Robot Systems"](https://doi.org/10.1109/IROS58592.2024.10802510), by Anthony Goeckner, Yueyuan Sui, Nicolas Martinet, Xinliang Li, and Qi Zhu of Northwestern University in Evanston, Illinois. A new implementation of the Graph Neural Network based policy is proposed as university project for the exam of Neural Networks.
 
