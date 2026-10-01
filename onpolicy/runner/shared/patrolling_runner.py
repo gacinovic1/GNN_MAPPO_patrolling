@@ -280,8 +280,7 @@ class PatrollingRunner(Runner):
 
             if self.all_args.save_gifs:        
                 frames = []
-                image = self.envs.envs[0].env.unwrapped.observation()[0]["frame"]
-                frames.append(image)
+
 
             dones = False
             while not np.all(dones):
