@@ -315,6 +315,13 @@ class PatrollingRunner(Runner):
                 # append frame
                 if self.all_args.save_gifs:        
                     image = infos[0]["frame"]
+                    if len(frames) == 0:
+                        frame_size = (image.shape[1], image.shape[0])
+
+                    else:
+                        from PIL import Image
+                        image = np.array(Image.fromarray(image).resize(frame_size))
+
                     frames.append(image)
 
             # save gif
