@@ -112,6 +112,7 @@ class parallel_env(ParallelEnv):
 
         self.alpha = alpha
         self.beta = beta
+        self.image = None
 
         # Create the agents with random starting positions.
         self.agentOrigins = random.sample(list(self.pg.graph.nodes), num_agents)
@@ -359,6 +360,12 @@ class parallel_env(ParallelEnv):
 
         plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
         plt.gcf().text(0,0,f'Current step: {self.step_count}, Average idleness time: {self.pg.getAverageIdlenessTime(self.step_count):.2f}')
+        fig = plt.gcf()
+        fig.canvas.draw()
+        width, height = fig.canvas.get_width_height()
+        image = np.frombuffer(fig.canvas.buffer_rgba(), dtype=np.uint8).reshape(height, width, 4)
+        image = image[:, :, :3] 
+        self.image = image
         plt.show()
 
 
@@ -927,6 +934,7 @@ class parallel_env(ParallelEnv):
         info_dict["stddev_idleness"] = self.pg.getStdDevIdlenessTime(self.step_count)
         info_dict["worst_idleness"] = self.pg.getWorstIdlenessTime(self.step_count)
         info_dict["agent_count"] = len(self.agents)
+        info_dict["frame"] = self.image
 
         # Check truncation conditions.
         if lastStep or (self.max_cycles >= 0 and self.step_count >= self.max_cycles):
