@@ -325,12 +325,6 @@ class PatrollingRunner(Runner):
 
             # save gif
             if self.all_args.save_gifs:
-                print(
-                len(frames),
-                frames[0].shape,
-                frames[0].min(),
-                frames[0].max(),
-                frames[0].mean())
                 imageio.mimsave(
                     uri="{}/{}-episode{}.gif".format(str(self.gif_dir), self.all_args.graph_name, i_episode),
                     ims=frames,
