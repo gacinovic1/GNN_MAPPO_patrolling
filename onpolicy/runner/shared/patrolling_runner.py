@@ -327,7 +327,7 @@ class PatrollingRunner(Runner):
             if self.all_args.save_gifs:
                 model_name = os.path.basename(os.path.normpath(self.all_args.model_dir))
                 imageio.mimsave(
-                    uri="{}/{}-episode{}.gif".format(str(self.gif_dir), model_name, i_episode),
+                    uri="{}/{}-episode{}.gif".format(str(self.gif_dir), self.all_args.graph_name, i_episode),
                     ims=frames,
                     format="GIF",
                     duration=self.all_args.ifi,
