@@ -360,12 +360,16 @@ class parallel_env(ParallelEnv):
 
         plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
         plt.gcf().text(0,0,f'Current step: {self.step_count}, Average idleness time: {self.pg.getAverageIdlenessTime(self.step_count):.2f}')
+        from io import BytesIO
+        from PIL import Image
         fig = plt.gcf()
-        fig.canvas.draw()
-        width, height = fig.canvas.get_width_height()
-        image = np.frombuffer( fig.canvas.buffer_rgba(), dtype=np.uint8).reshape(height, width, 4)[:, :, :3]
-        self.image = image
         plt.show()
+        buf = BytesIO()
+        fig.savefig(buf, format='png', dpi=100, bbox_inches='tight')
+        buf.seek(0)
+        image = np.array(Image.open(buf).convert('RGB'))
+        self.image = image.copy()
+        buf.close()
         plt.close(fig)
 
 
