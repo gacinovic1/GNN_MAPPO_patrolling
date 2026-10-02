@@ -5,6 +5,7 @@ from onpolicy.algorithms.utils.util import init, check
 from onpolicy.algorithms.utils.cnn import CNNBase
 from onpolicy.algorithms.utils.mlp import MLPBase, MLPLayer
 from onpolicy.algorithms.utils.gnn import GNNBase
+from onpolicy.algorithms.utils.my_gnn import MyGNN
 from onpolicy.algorithms.utils.rnn import RNNLayer
 from onpolicy.algorithms.utils.rnn import RNNLayer
 from onpolicy.algorithms.utils.act import ACTLayer
@@ -35,6 +36,7 @@ class R_Actor(nn.Module):
         self._use_naive_recurrent_policy = args.use_naive_recurrent_policy
         self._use_recurrent_policy = args.use_recurrent_policy
         self._use_gnn = args.use_gnn_policy
+        self._use_my_gnn = args.use_my_gnn
         self._use_gnn_mlp = args.use_gnn_mlp_policy
         self._recurrent_N = args.recurrent_N
         self.tpdv = dict(dtype=torch.float32, device=device)
@@ -48,19 +50,36 @@ class R_Actor(nn.Module):
             obs_space_nongraph = strip_graph_obs_space(obs_space)
             self.obs_space_graph_idx = get_graph_obs_space_idx(obs_space)
 
-            self.base = GNNBase(
-                layers=args.gnn_layer_N,
-                node_dim=get_shape_from_obs_space(obs_space_graph.node_space)[0],
-                edge_dim=get_shape_from_obs_space(obs_space_graph.edge_space)[0],
-                hidden_dim=args.gnn_hidden_size,
-                output_dim=args.gnn_hidden_size, #self.hidden_size,
-                node_type_idx=obs_space_graph.node_type_idx,
-                node_type_dim=1,
-                node_type_embed_dim=2,
-                node_embedding_num=args.gnn_node_embedding_num,
-                dropout_rate=args.gnn_dropout_rate,
-                jk=args.gnn_skip_connections
-            )
+            if not self._use_my_gnn:
+                
+                self.base = GNNBase(
+                    layers=args.gnn_layer_N,
+                    node_dim=get_shape_from_obs_space(obs_space_graph.node_space)[0],
+                    edge_dim=get_shape_from_obs_space(obs_space_graph.edge_space)[0],
+                    hidden_dim=args.gnn_hidden_size,
+                    output_dim=args.gnn_hidden_size, #self.hidden_size,
+                    node_type_idx=obs_space_graph.node_type_idx,
+                    node_type_dim=1,
+                    node_type_embed_dim=args.gnn_node_type_embed_dim,
+                    node_embedding_num=args.gnn_node_embedding_num,
+                    dropout_rate=args.gnn_dropout_rate,
+                    jk=args.gnn_skip_connections
+                )
+                
+            else:
+                self.base = MyGNN(
+                    layers=args.gnn_layer_N,
+                    node_dim=get_shape_from_obs_space(obs_space_graph.node_space)[0],
+                    edge_dim=get_shape_from_obs_space(obs_space_graph.edge_space)[0],
+                    hidden_dim=args.gnn_hidden_size,
+                    output_dim=args.gnn_hidden_size, #self.hidden_size,
+                    node_type_idx=obs_space_graph.node_type_idx,
+                    node_type_dim=1,
+                    node_type_embed_dim=args.gnn_node_type_embed_dim,
+                    node_embedding_num=args.gnn_node_embedding_num,
+                    dropout_rate=args.gnn_dropout_rate,
+                    jk= args.gnn_skip_connections
+                )
 
             
 
