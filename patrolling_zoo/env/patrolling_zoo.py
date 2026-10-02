@@ -363,10 +363,10 @@ class parallel_env(ParallelEnv):
         fig = plt.gcf()
         fig.canvas.draw()
         width, height = fig.canvas.get_width_height()
-        image = np.frombuffer(fig.canvas.buffer_rgba(), dtype=np.uint8).reshape(height, width, 4)
-        image = image[:, :, :3] 
+        image = np.frombuffer( fig.canvas.buffer_rgba(), dtype=np.uint8).reshape(height, width, 4)[:, :, :3]
         self.image = image
         plt.show()
+        plt.close(fig)
 
 
     def observation_space(self, agent):

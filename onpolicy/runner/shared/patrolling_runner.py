@@ -307,7 +307,9 @@ class PatrollingRunner(Runner):
                 # Split the combined observations into obs and share_obs, then combine across environments.
                 obs, share_obs, available_actions = self._process_combined_obs(combined_obs)
 
-                render_env.envs[0].env.render()
+                if not np.all(dones):
+                    clear_output(wait=True)
+                    render_env.envs[0].env.render()
 
                 if self.all_args.save_gifs:
                     image = render_env.envs[0].env.image
@@ -320,17 +322,6 @@ class PatrollingRunner(Runner):
 
                     frames.append(image)
 
-                # append frame
-                if self.all_args.save_gifs:        
-                    image = render_env.envs[0].env.image
-                    if len(frames) == 0:
-                        frame_size = (image.shape[1], image.shape[0])
-
-                    else:
-                        from PIL import Image
-                        image = np.array(Image.fromarray(image).resize(frame_size))
-
-                    frames.append(image)
 
             # save gif
             if self.all_args.save_gifs:
