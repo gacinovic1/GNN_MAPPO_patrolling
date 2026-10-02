@@ -311,21 +311,26 @@ class PatrollingRunner(Runner):
                     clear_output(wait=True)
                     render_env.envs[0].env.render()
 
-                if self.all_args.save_gifs:
-                    image = render_env.envs[0].env.image
+                    if self.all_args.save_gifs:
+                        image = render_env.envs[0].env.image.copy()
 
-                    if len(frames) == 0:
-                        frame_size = (image.shape[1], image.shape[0])
-                    else:
-                        from PIL import Image
-                        image = np.array(Image.fromarray(image).resize(frame_size))
+                        if len(frames) == 0:
+                            frame_size = (image.shape[1], image.shape[0])
+                        else:
+                            from PIL import Image
+                            image = np.array(Image.fromarray(image).resize(frame_size))
 
-                    frames.append(image)
+                        frames.append(image)
 
 
             # save gif
             if self.all_args.save_gifs:
-                model_name = os.path.basename(os.path.normpath(self.all_args.model_dir))
+                print(
+                len(frames),
+                frames[0].shape,
+                frames[0].min(),
+                frames[0].max(),
+                frames[0].mean())
                 imageio.mimsave(
                     uri="{}/{}-episode{}.gif".format(str(self.gif_dir), self.all_args.graph_name, i_episode),
                     ims=frames,
