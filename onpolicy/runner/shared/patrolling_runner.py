@@ -28,6 +28,8 @@ class PatrollingRunner(Runner):
         # Perform restoration.
         config['all_args'].model_dir = model_dir
         self.model_dir = config['all_args'].model_dir
+        self.gif_dir = config['all_args'].gif_dir if config['all_args'].use_render else None
+        os.makedirs(self.gif_dir, exist_ok=True)
         if self.model_dir is not None:
             self.restore()
        
@@ -317,8 +319,9 @@ class PatrollingRunner(Runner):
 
             # save gif
             if self.all_args.save_gifs:
+                model_name = os.path.basename(os.path.normpath(self.all_args.model_dir))
                 imageio.mimsave(
-                    uri="{}/episode{}.gif".format(str(self.gif_dir), i_episode),
+                    uri="{}/{}-episode{}.gif".format(str(self.gif_dir), model_name, i_episode),
                     ims=frames,
                     format="GIF",
                     duration=self.all_args.ifi,
