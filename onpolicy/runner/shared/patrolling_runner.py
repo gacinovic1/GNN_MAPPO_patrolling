@@ -314,7 +314,7 @@ class PatrollingRunner(Runner):
 
                 # append frame
                 if self.all_args.save_gifs:        
-                    image = infos["frame"]
+                    image = render_env.envs[0].env.image
                     if len(frames) == 0:
                         frame_size = (image.shape[1], image.shape[0])
 
