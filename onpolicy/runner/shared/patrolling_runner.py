@@ -29,7 +29,8 @@ class PatrollingRunner(Runner):
         config['all_args'].model_dir = model_dir
         self.model_dir = config['all_args'].model_dir
         self.gif_dir = config['all_args'].gif_dir if config['all_args'].use_render else None
-        os.makedirs(self.gif_dir, exist_ok=True)
+        if self.config['all_args'].use_render:
+            os.makedirs(self.gif_dir, exist_ok=True)
         if self.model_dir is not None:
             self.restore()
        
