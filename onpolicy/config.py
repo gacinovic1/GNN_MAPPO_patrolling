@@ -212,6 +212,8 @@ def get_config():
                         help="The gain # of last action layer")
     parser.add_argument("--gnn_node_type_embed_dim",type=int,default=2)
     parser.add_argument("--use_my_gnn",type=bool,default=False)
+    parser.add_argument("--my_gnn_activation",type=str,default="relu")
+    parser.add_argument("--my_gnn_aggregation",type=str,default="sum")
 
     # graph neural network parameters
     parser.add_argument("--use_gnn_policy", action='store_true',

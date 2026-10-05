@@ -78,7 +78,9 @@ class R_Actor(nn.Module):
                     node_type_embed_dim=args.gnn_node_type_embed_dim,
                     node_embedding_num=args.gnn_node_embedding_num,
                     dropout_rate=args.gnn_dropout_rate,
-                    jk= args.gnn_skip_connections
+                    jk= args.gnn_skip_connections,
+                    activation=args.my_gnn_activation,
+                    aggregation=args.my_gnn_aggregation
                 )
 
             
