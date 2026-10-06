@@ -79,7 +79,7 @@ class PatrollingRunner(Runner):
             
             # save model
             if (total_num_steps % self.save_interval == 0 or episode == episodes - 1):
-                self.save()
+                self.save(episode=episode,total_num_steps=total_num_steps)
 
             # log information
             if total_num_steps % self.log_interval == 0:
