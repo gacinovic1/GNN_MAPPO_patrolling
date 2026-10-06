@@ -2,6 +2,7 @@ import wandb
 import os
 import numpy as np
 import torch
+import random
 from tensorboardX import SummaryWriter
 from onpolicy.utils.shared_buffer import SharedReplayBuffer
 
@@ -124,26 +125,49 @@ class Runner(object):
         self.buffer.after_update()
         return train_infos
 
-    def save(self):
-        """Save policy's actor and critic networks."""
-        policy_actor = self.trainer.policy.actor
-        torch.save(policy_actor.state_dict(), str(self.save_dir) + "/actor.pt")
-        policy_critic = self.trainer.policy.critic
-        torch.save(policy_critic.state_dict(), str(self.save_dir) + "/critic.pt")
+    def save(self, episode=None, total_num_steps=None):
+
+        checkpoint = {"actor": self.trainer.policy.actor.state_dict(), "critic": self.trainer.policy.critic.state_dict(),
+                      "actor_optimizer": self.trainer.policy.actor_optimizer.state_dict(),
+                      "critic_optimizer": self.trainer.policy.critic_optimizer.state_dict(),
+                      "episode": episode,
+                      "total_num_steps": total_num_steps,
+                      "python_rng_state": random.getstate(),
+                      "numpy_rng_state": np.random.get_state(),
+                      "torch_rng_state": torch.get_rng_state(),}
+
         if self.trainer._use_valuenorm:
-            policy_vnorm = self.trainer.value_normalizer
-            torch.save(policy_vnorm.state_dict(), str(self.save_dir) + "/vnorm.pt")
+            checkpoint["value_normalizer"] = self.trainer.value_normalizer.state_dict()
+
+        if torch.cuda.is_available():
+            checkpoint["cuda_rng_state"] = torch.cuda.get_rng_state_all()
+
+        torch.save(checkpoint, str(self.save_dir) + "/checkpoint.pt")
 
     def restore(self):
-        """Restore policy's networks from a saved model."""
-        policy_actor_state_dict = torch.load(str(self.model_dir) + '/actor.pt')
-        self.policy.actor.load_state_dict(policy_actor_state_dict)
-        if not self.all_args.use_render:
-            policy_critic_state_dict = torch.load(str(self.model_dir) + '/critic.pt')
-            self.policy.critic.load_state_dict(policy_critic_state_dict)
-            if self.trainer._use_valuenorm:
-                policy_vnorm_state_dict = torch.load(str(self.model_dir) + '/vnorm.pt')
-                self.trainer.value_normalizer.load_state_dict(policy_vnorm_state_dict)
+
+        checkpoint_path = str(self.model_dir) + "/checkpoint.pt"
+
+        checkpoint = torch.load(checkpoint_path,map_location=self.device, weights_only=False)
+        self.policy.actor.load_state_dict(checkpoint["actor"])
+        self.policy.critic.load_state_dict(checkpoint["critic"])
+        self.trainer.policy.actor_optimizer.load_state_dict(checkpoint["actor_optimizer"])
+        self.trainer.policy.critic_optimizer.load_state_dict(checkpoint["critic_optimizer"])
+
+        if self.trainer._use_valuenorm:
+            self.trainer.value_normalizer.load_state_dict(checkpoint["value_normalizer"])
+
+        self.start_episode = checkpoint.get("episode", -1) + 1
+        self.start_num_steps = checkpoint.get("total_num_steps", 0)
+
+        random.setstate(checkpoint["python_rng_state"])
+        np.random.set_state(checkpoint["numpy_rng_state"])
+        torch.set_rng_state(checkpoint["torch_rng_state"])
+
+        if (torch.cuda.is_available() and "cuda_rng_state" in checkpoint):
+            torch.cuda.set_rng_state_all(checkpoint["cuda_rng_state"])
+
+        print("Restored checkpoint:" f" episode={self.start_episode}," f" total_num_steps={self.start_num_steps}")
  
     def log_train(self, train_infos, total_num_steps):
         """
