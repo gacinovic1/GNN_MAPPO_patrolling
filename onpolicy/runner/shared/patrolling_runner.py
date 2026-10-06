@@ -32,6 +32,10 @@ class PatrollingRunner(Runner):
         self.gif_dir = config['all_args'].gif_dir if config['all_args'].use_render else None
         if config['all_args'].use_render:
             os.makedirs(self.gif_dir, exist_ok=True)
+            
+        self.start_episode = 0
+        self.start_num_steps = 0
+        
         if self.model_dir is not None:
             self.restore()
        
