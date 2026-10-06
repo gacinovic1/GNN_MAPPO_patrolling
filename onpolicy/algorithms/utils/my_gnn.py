@@ -68,9 +68,9 @@ class MyGNN(nn.Module):
 
                 degree = torch.zeros(h.shape[0], device=h.device, dtype=h.dtype)
                 degree.index_add_(0, target,torch.ones(target.shape[0], device=h.device, dtype=h.dtype))
-                degree = degree.clamp(min=1.0).unsqueeze(-1)
+                
 
-                aggregated = aggregated / degree
+                aggregated = aggregated/degree
 
             else:
                 raise ValueError(f"Unsupported aggregation: {self.aggregation}")
