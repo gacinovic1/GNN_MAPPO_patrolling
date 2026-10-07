@@ -14,6 +14,7 @@ class MyGNN(nn.Module):
         self.activation_name = activation
         self.aggregation = aggregation
         self.dropout = nn.Dropout(dropout_rate)
+        self.jk = jk  # whether to use Jumping Knowledge (JK) mechanism
 
         if activation == "relu":
             self.activation = F.relu
@@ -42,10 +43,17 @@ class MyGNN(nn.Module):
 
             self.gnn_layers.append(nn.Linear(update_input_dim, layer_output_dim))
             
+            if self.jk:
+                self.jk_linear = nn.Linear(layers * hidden_dim, output_dim)
+            else:
+                self.jk_linear = None
+            
 
     def forward(self, x, edge_attr, edge_index):
 
         h = x  # h^0_v <- x_v
+        
+        layer_outputs = []
 
         for k, layer in enumerate(self.gnn_layers):
 
@@ -89,7 +97,13 @@ class MyGNN(nn.Module):
             # h_v^k <- h_v^k / ||h_v^k||_2  (L2 regularization)
             
             h = F.normalize(h,p=2,dim=-1)
+            
+            layer_outputs.append(h)
+            
+        if self.jk:
 
+            h_jk = torch.cat(layer_outputs, dim=-1)
+            h = self.jk_linear(h_jk)
     
         z = h  # z_v <- h_v^K
 
