@@ -134,7 +134,7 @@ class Runner(object):
                       "total_num_steps": total_num_steps,
                       "python_rng_state": random.getstate(),
                       "numpy_rng_state": np.random.get_state(),
-                      "torch_rng_state": torch.get_rng_state()}
+                      "torch_rng_state": torch.get_rng_state(),}
 
         if self.trainer._use_valuenorm:
             checkpoint["value_normalizer"] = self.trainer.value_normalizer.state_dict()
