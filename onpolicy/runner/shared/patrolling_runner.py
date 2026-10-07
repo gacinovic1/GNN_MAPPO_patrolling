@@ -88,7 +88,7 @@ class PatrollingRunner(Runner):
                         .format(self.env_name,
                                 self.algorithm_name,
                                 self.experiment_name,
-                                episode,
+                                episode+1,
                                 episodes,
                                 total_num_steps,
                                 self.num_env_steps,
