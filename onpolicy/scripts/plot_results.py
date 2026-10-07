@@ -38,8 +38,6 @@ def main():
 
     plot_path = os.path.join(output_dir, "rewards_vs_idleness.png")
     plt.savefig(plot_path, dpi=300, bbox_inches="tight")
-    plt.show()
-    plt.close()
 
 if __name__ == "__main__":
     main()
