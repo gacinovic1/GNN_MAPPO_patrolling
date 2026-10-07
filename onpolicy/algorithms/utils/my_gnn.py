@@ -13,6 +13,7 @@ class MyGNN(nn.Module):
         self.hidden_dim = hidden_dim
         self.activation_name = activation
         self.aggregation = aggregation
+        self.dropout = nn.Dropout(dropout_rate)
 
         if activation == "relu":
             self.activation = F.relu
@@ -46,7 +47,7 @@ class MyGNN(nn.Module):
 
         h = x  # h^0_v <- x_v
 
-        for layer in self.gnn_layers:
+        for k, layer in enumerate(self.gnn_layers):
 
             source = edge_index[0]  # source nodes u
             target = edge_index[1]  # destination nodes v
@@ -81,6 +82,9 @@ class MyGNN(nn.Module):
             update_input = torch.cat([h, aggregated],dim=-1)
             h = layer(update_input)
             h = self.activation(h)
+            
+            if k < len(self.gnn_layers)-1:   # dropout layer
+                h = self.dropout(h)
 
             # h_v^k <- h_v^k / ||h_v^k||_2  (L2 regularization)
             
