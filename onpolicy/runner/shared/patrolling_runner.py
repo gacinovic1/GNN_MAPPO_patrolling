@@ -44,6 +44,11 @@ class PatrollingRunner(Runner):
 
         start = time.time()
         episodes = int(self.num_env_steps) // self.episode_length // self.n_rollout_threads
+        
+        if self.all_args.save_plots:
+            environment_steps = []
+            average_idleness = []
+            average_reward = []
 
         for episode in range(self.start_episode, episodes):
             if self.use_linear_lr_decay:
@@ -76,6 +81,14 @@ class PatrollingRunner(Runner):
             
             # post process
             total_num_steps = (episode + 1) * self.episode_length * self.n_rollout_threads
+            
+            if self.all_args.save_plots:
+
+                episode_average_reward = (np.mean(self.buffer.rewards)* self.episode_length)
+                episode_average_idleness = (np.mean(self.env_infos["avg_idleness"]))
+                environment_steps.append(total_num_steps)
+                average_reward.append(episode_average_reward)
+                average_idleness.append(episode_average_idleness)
             
             # save model
             if (total_num_steps % self.save_interval == 0 or episode == episodes - 1):
