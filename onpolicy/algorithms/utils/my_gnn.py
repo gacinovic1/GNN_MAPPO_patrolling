@@ -104,9 +104,13 @@ class MyGNN(nn.Module):
                 layer_outputs.append(h)
             
         if self.jk:
-
+            
+            print("JK:", self.jk)
+            print("layer outputs:", [h.shape for h in layer_outputs])
             h_jk = torch.cat(layer_outputs, dim=-1)
+            print("concat:", h_jk.shape)
             h = self.jk_linear(h_jk)
+            print("final:", h.shape)
     
         z = h  # z_v <- h_v^K
 
