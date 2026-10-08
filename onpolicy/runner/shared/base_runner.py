@@ -149,9 +149,6 @@ class Runner(object):
         checkpoint_path = str(self.model_dir) + "/checkpoint.pt"
 
         checkpoint = torch.load(checkpoint_path,map_location=self.device, weights_only=False)
-        print("device self.device:", self.device)
-        print("torch RNG device:", checkpoint["torch_rng_state"].device)
-        print("torch RNG dtype:", checkpoint["torch_rng_state"].dtype)
         self.policy.actor.load_state_dict(checkpoint["actor"])
         self.policy.critic.load_state_dict(checkpoint["critic"])
         self.trainer.policy.actor_optimizer.load_state_dict(checkpoint["actor_optimizer"])
@@ -165,7 +162,7 @@ class Runner(object):
 
         random.setstate(checkpoint["python_rng_state"])
         np.random.set_state(checkpoint["numpy_rng_state"])
-        torch.set_rng_state(checkpoint["torch_rng_state"])
+        torch.set_rng_state(checkpoint["torch_rng_state"].cpu())
 
         if (torch.cuda.is_available() and "cuda_rng_state" in checkpoint):
             torch.cuda.set_rng_state_all(checkpoint["cuda_rng_state"])
