@@ -98,7 +98,7 @@ class MyGNN(nn.Module):
 
             # h_v^k <- h_v^k / ||h_v^k||_2  (L2 regularization)
             
-            h = F.normalize(h,p=2,dim=-1)
+            #h = F.normalize(h,p=2,dim=-1)
             
             if self.jk:
                 layer_outputs.append(h)
