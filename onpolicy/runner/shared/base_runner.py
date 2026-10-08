@@ -149,6 +149,9 @@ class Runner(object):
         checkpoint_path = str(self.model_dir) + "/checkpoint.pt"
 
         checkpoint = torch.load(checkpoint_path,map_location=self.device, weights_only=False)
+        print("device self.device:", self.device)
+        print("torch RNG device:", checkpoint["torch_rng_state"].device)
+        print("torch RNG dtype:", checkpoint["torch_rng_state"].dtype)
         self.policy.actor.load_state_dict(checkpoint["actor"])
         self.policy.critic.load_state_dict(checkpoint["critic"])
         self.trainer.policy.actor_optimizer.load_state_dict(checkpoint["actor_optimizer"])
