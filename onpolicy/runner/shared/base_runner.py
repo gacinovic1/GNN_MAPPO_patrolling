@@ -165,7 +165,7 @@ class Runner(object):
         torch.set_rng_state(checkpoint["torch_rng_state"].cpu())
 
         if (torch.cuda.is_available() and "cuda_rng_state" in checkpoint):
-            torch.cuda.set_rng_state_all(checkpoint["cuda_rng_state"])
+            torch.cuda.set_rng_state_all([state.cpu() for state in checkpoint["cuda_rng_state"]])
 
         print("Restored checkpoint:" f" episode={self.start_episode}," f" total_num_steps={self.start_num_steps}")
  
