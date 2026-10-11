@@ -8,6 +8,7 @@ import imageio
 import numpy as np
 import torch
 import wandb
+import csv
 
 from onpolicy.utils.util import update_linear_schedule
 from onpolicy.runner.shared.base_runner import Runner
@@ -279,6 +280,11 @@ class PatrollingRunner(Runner):
         # init goal
         render_goals = np.zeros(self.all_args.render_episodes)
         for i_episode in range(self.all_args.render_episodes):
+            
+            log_path = os.path.join(self.gif_dir if self.gif_dir is not None else ".",f"idleness_episode_{i_episode}.csv")
+            idleness_log = []
+            elapsed_steps = 0
+            
             combined_obs = render_env.reset()
             rnn_states = np.zeros((self.n_render_rollout_threads, self.num_agents, self.recurrent_N, self.hidden_size), dtype=np.float32)
             masks = np.ones((self.n_render_rollout_threads, self.num_agents, 1), dtype=np.float32)
@@ -309,6 +315,10 @@ class PatrollingRunner(Runner):
 
                 # step
                 combined_obs, render_rewards, dones, infos = render_env.step(actions_env)
+                
+                avg_idleness = infos[0]["avg_idleness"]
+                idleness_log.append({"time_step": elapsed_steps, "avg_idleness": avg_idleness})
+                elapsed_steps += 1
 
                 # Split the combined observations into obs and share_obs, then combine across environments.
                 obs, share_obs, available_actions = self._process_combined_obs(combined_obs)
@@ -328,7 +338,6 @@ class PatrollingRunner(Runner):
 
                         frames.append(image)
 
-
             # save gif
             if self.all_args.save_gifs:
                 imageio.mimsave(
@@ -337,6 +346,12 @@ class PatrollingRunner(Runner):
                     format="GIF",
                     duration=self.all_args.ifi,
                 )
+                
+            with open(log_path, "w", newline="") as f:
+                writer = csv.DictWriter(f,fieldnames=["time_step", "avg_idleness"])
+                writer.writeheader()
+                writer.writerows(idleness_log)
+
     
     def _process_combined_obs(self, combined_obs):
         ''' Process the combined observations into obs and share_obs. '''
