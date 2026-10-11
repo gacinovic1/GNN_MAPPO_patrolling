@@ -17,12 +17,24 @@ def load_results(summary_path):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("log_dir")
+    parser.add_argument("log_dirs", nargs="+")
     args = parser.parse_args()
 
-    my_gnn_log = os.path.join(args.log_dir, "summary.json")
-    steps_my, reward_my, idleness_my = load_results(my_gnn_log)
+    steps_my = []
+    reward_my = []
+    idleness_my = []
 
+    for log_dir in args.log_dirs:
+        summary_path = os.path.join(log_dir, "summary.json")
+        steps, reward, idleness = load_results(summary_path)
+
+        steps_my.extend(steps)
+        reward_my.extend(reward)
+        idleness_my.extend(idleness)
+
+    data = sorted(zip(steps_my, reward_my, idleness_my))
+    steps_my, reward_my, idleness_my = map(list, zip(*data))
+    
     plt.figure(figsize=(10, 6))
     plt.plot(steps_my, idleness_my, color="blue", marker="o", markersize=3, linewidth=1.2, label="Average Idleness")
     plt.plot(steps_my, reward_my, color="orange", marker="o", markersize=3, linewidth=1.2, label="Average Reward")
@@ -33,7 +45,7 @@ def main():
     plt.legend()
     plt.tight_layout()
 
-    output_dir = os.path.join(args.log_dir, "plots")
+    output_dir = os.path.join(os.path.commonpath(args.log_dirs), "plots")
     os.makedirs(output_dir, exist_ok=True)
 
     plot_path = os.path.join(output_dir, "rewards_vs_idleness.png")
