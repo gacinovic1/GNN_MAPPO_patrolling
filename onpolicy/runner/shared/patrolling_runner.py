@@ -348,9 +348,18 @@ class PatrollingRunner(Runner):
                 )
                 
             with open(log_path, "w", newline="") as f:
-                writer = csv.DictWriter(f,fieldnames=["time_step", "avg_idleness"])
+                
+                fields = ["time_step","avg_idleness", "observation_radius", "communication_probability", "attrition_fixed_times"]
+                writer = csv.DictWriter(f, fieldnames=fields)
                 writer.writeheader()
-                writer.writerows(idleness_log)
+
+                for i, row in enumerate(idleness_log):
+                    if i == 0:
+                        row["observation_radius"] = self.all_args.observation_radius
+                        row["communication_probability"] = self.all_args.communication_probability
+                        row["attrition_fixed_times"] = str(self.all_args.attrition_fixed_times)
+
+                    writer.writerow(row)
 
     
     def _process_combined_obs(self, combined_obs):
