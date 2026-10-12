@@ -77,8 +77,11 @@ def main():
             os.makedirs(output_dir, exist_ok=True)
         plt.savefig(plot_path, dpi=300, bbox_inches="tight")
     else:
-        for output_dir in enumerate(args.log_dirs):
-            plt.savefig(output_dir, dpi=300, bbox_inches="tight")
+        for i, output_dir in enumerate(args.log_dirs):
+            plot_path = os.path.join(output_dir,"average_idleness_comparison.png")
+            plt.savefig(plot_path, dpi=300, bbox_inches="tight")
+            
+    plt.show()
 
 if __name__ == "__main__":
     main()
