@@ -59,7 +59,7 @@ def main():
             color = "red"
         else:
             label = "MyGNN"
-            color = "lightblue"
+            color = "blue"
 
         plt.plot(time,idleness,color=color,linewidth=1.2,label=label)
 
