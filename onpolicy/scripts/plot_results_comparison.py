@@ -2,12 +2,15 @@
 import csv
 import matplotlib.pyplot as plt
 import os
+import ast
 import argparse
 
 
 def load_results(csv_path, step_duration):
+    
     time = []
     idleness = []
+    params = {}
 
     with open(csv_path, "r", newline="") as f:
         reader = csv.DictReader(f)
@@ -16,7 +19,10 @@ def load_results(csv_path, step_duration):
             time.append(float(row["time_step"]) * step_duration)
             idleness.append(float(row["avg_idleness"]) * step_duration)
 
-    return time, idleness
+            if not params:
+                params = {"observation_radius": row.get("observation_radius", ""), "communication_probability": row.get("communication_probability", "" ),"attrition_fixed_times": row.get("attrition_fixed_times", "")}
+
+    return time, idleness, params
 
 
 def main():
@@ -31,6 +37,9 @@ def main():
         raise ValueError("Too many arguments.")
 
     plt.figure(figsize=(10, 6))
+    
+    evaluated_params = []
+    attrition_steps = set()
 
     for i, log_dir in enumerate(args.log_dirs):
         if os.path.isfile(log_dir):
@@ -47,7 +56,7 @@ def main():
                 else:
                     raise FileNotFoundError(f"CSV not found in {log_dir}")
 
-        time, idleness = load_results(csv_path, args.step_duration)
+        time, idleness, params = load_results(csv_path, args.step_duration)
 
         if len(args.log_dirs) == 1:
             original = "original" in log_dir.lower()
@@ -60,13 +69,29 @@ def main():
         else:
             label = "MyGNN"
             color = "blue"
+            
+        evaluated_params.append((label, params))
+
+        if params["attrition_fixed_times"]:
+            steps = ast.literal_eval(params["attrition_fixed_times"])
+            attrition_steps.update(step * args.step_duration for step in steps)
 
         plt.plot(time,idleness,color=color,linewidth=1.2,label=label)
 
     plt.xlabel("Time Elapsed (s)")
     plt.ylabel("Av. Node Idleness (s)")
-    plt.title("Average Node Idleness During Evaluation")
+    
+    radius = ", ".join(f"{label}={params['observation_radius']}" for label, params in evaluated_params if params["observation_radius"])
+    communication = ", ".join(f"{label}={params['communication_probability']}" for label, params in evaluated_params if params["communication_probability"])
+
+    plt.title("Average Node Idleness\n" f"Observation radius: {radius} | " f"Communication chance: {100*communication}%")
     plt.grid(True, linestyle="--", alpha=0.25)
+    
+    ax = plt.gca()
+    for t in sorted(attrition_steps):
+        ax.axvline(t, color="black", linestyle="--", linewidth=1)
+        ax.annotate( "attrition", xy=(t, 1), xycoords=("data", "axes fraction"), xytext=(3, -3), textcoords="offset points", rotation=90, ha="left", va="top", fontsize=8)
+        
     plt.legend()
     plt.tight_layout()
 
