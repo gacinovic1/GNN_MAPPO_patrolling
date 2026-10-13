@@ -104,7 +104,7 @@ def main():
         plt.savefig(plot_path, dpi=300, bbox_inches="tight")
     else:
         for i, output_dir in enumerate(args.log_dirs):
-            plot_path = os.path.join(output_dir,"average_idleness_comparison.png")
+            plot_path = os.path.join(output_dir,f"average_idleness_comparison_{args.episode}.png")
             plt.savefig(plot_path, dpi=300, bbox_inches="tight")
             
     plt.show()
