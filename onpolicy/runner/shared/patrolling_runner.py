@@ -1,6 +1,7 @@
 from collections import defaultdict, deque
 from itertools import chain
 import os
+import re
 import time
 import random
 
@@ -279,9 +280,18 @@ class PatrollingRunner(Runner):
 
         # init goal
         render_goals = np.zeros(self.all_args.render_episodes)
+        
+        last_episodes = []
+
+        for filename in os.listdir(self.gif_dir):
+            episode_num = re.findall(r'\d+', filename)
+            last_episodes.extend(map(int, episode_num))
+
+        last_episode_idx = max(last_episodes)+1 if last_episodes else -1
+        
         for i_episode in range(self.all_args.render_episodes):
             
-            log_path = os.path.join(self.gif_dir if self.gif_dir is not None else ".",f"idleness_episode_{i_episode}.csv")
+            log_path = os.path.join(self.gif_dir if self.gif_dir is not None else ".",f"idleness_episode_{last_episode_idx + i_episode}.csv")
             idleness_log = []
             elapsed_steps = 0
             
@@ -341,7 +351,7 @@ class PatrollingRunner(Runner):
             # save gif
             if self.all_args.save_gifs:
                 imageio.mimsave(
-                    uri="{}/{}-episode{}.gif".format(str(self.gif_dir), self.all_args.graph_name, i_episode),
+                    uri="{}/{}-episode{}.gif".format(str(self.gif_dir), self.all_args.graph_name, last_episode_idx + i_episode),
                     ims=frames,
                     format="GIF",
                     duration=self.all_args.ifi,
