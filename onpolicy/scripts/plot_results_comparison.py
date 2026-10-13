@@ -82,9 +82,9 @@ def main():
     plt.ylabel("Av. Node Idleness (s)")
     
     radius = ", ".join(f"{label}={params['observation_radius']}" for label, params in evaluated_params if params["observation_radius"])
-    communication = ", ".join(f"{label}={params['communication_probability']}" for label, params in evaluated_params if params["communication_probability"])
+    communication = ", ".join(f"{label}={100*float(params['communication_probability']):.0f}%" for label, params in evaluated_params if params["communication_probability"])
 
-    plt.title("Average Node Idleness\n" f"Observation radius: {radius} | " f"Communication chance: {100*communication}%")
+    plt.title("Average Node Idleness\n" f"Observation radius: {radius} | " f"Communication chance: {communication}")
     plt.grid(True, linestyle="--", alpha=0.25)
     
     ax = plt.gca()
