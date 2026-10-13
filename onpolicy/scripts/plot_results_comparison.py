@@ -89,8 +89,9 @@ def main():
     
     ax = plt.gca()
     for t in sorted(attrition_steps):
-        ax.axvline(t, color="black", linestyle="--", linewidth=1)
-        ax.annotate( "attrition", xy=(t, 1), xycoords=("data", "axes fraction"), xytext=(3, -3), textcoords="offset points", rotation=90, ha="left", va="top", fontsize=8)
+        if t <= max(time):
+            ax.axvline(t, color="black", linestyle="--", linewidth=1)
+            ax.annotate("attrition", xy=(t, 1), xycoords=("data", "axes fraction"), xytext=(3, -3), textcoords="offset points", rotation=90, ha="left", va="top", fontsize=8)
         
     plt.legend()
     plt.tight_layout()
