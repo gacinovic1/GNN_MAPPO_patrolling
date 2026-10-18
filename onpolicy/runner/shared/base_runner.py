@@ -150,9 +150,13 @@ class Runner(object):
 
         checkpoint = torch.load(checkpoint_path,map_location=self.device, weights_only=False)
         self.policy.actor.load_state_dict(checkpoint["actor"])
-        self.policy.critic.load_state_dict(checkpoint["critic"])
-        self.trainer.policy.actor_optimizer.load_state_dict(checkpoint["actor_optimizer"])
-        self.trainer.policy.critic_optimizer.load_state_dict(checkpoint["critic_optimizer"])
+
+        if not getattr(self.all_args, "use_render", False):
+            
+            self.policy.critic.load_state_dict(checkpoint["critic"])
+            self.trainer.policy.actor_optimizer.load_state_dict(checkpoint["actor_optimizer"])
+            self.trainer.policy.critic_optimizer.load_state_dict(checkpoint["critic_optimizer"])
+
 
         if self.trainer._use_valuenorm:
             self.trainer.value_normalizer.load_state_dict(checkpoint["value_normalizer"])
