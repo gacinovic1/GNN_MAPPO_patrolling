@@ -60,7 +60,7 @@ def communication_loss_percent(params):
     success = params.get("communication_probability", "")
     if success not in ("", None):
         # communication_probability is the probability of successful communication.
-        return 100.0 * (1.0 - float(success))
+        return 100.0 * (float(success))
     return None
 
 
